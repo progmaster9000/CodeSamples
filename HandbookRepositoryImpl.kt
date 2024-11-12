@@ -163,46 +163,38 @@ class HandbookRepositoryImpl @Inject constructor(
 
     override suspend fun deleteQuestion(sectionId: String, questionId: String) {
         try {
-            // Reference to the section's subcollection of questions
             val questionDocRef = db.collection("sections")
                 .document(sectionId)
                 .collection("questions")
                 .document(questionId)
 
-            // Delete the question document
             questionDocRef.delete().await()
 
         } catch (e: Exception) {
             e.printStackTrace()
-            // Handle the exception, e.g., log an error or rethrow it as needed
         }
     }
 
     override suspend fun upsertQuestion(question: Question) {
         try {
-            // Reference to the section's subcollection of questions
             val questionCollectionRef = db.collection("sections")
                 .document(question.sectionId)
                 .collection("questions")
 
-            // Check if the question has a questionId for upserting (updating or inserting)
             if (question.questionId.isNotEmpty()) {
-                // If questionId is provided, update the existing document
                 val questionDocRef = questionCollectionRef.document(question.questionId)
 
-                questionDocRef.set(question).await()  // Use set() to upsert the question
+                questionDocRef.set(question).await()
 
             } else {
-                // If no questionId is provided, add a new question document
-                val newDocRef = questionCollectionRef.document()  // Auto-generate an ID
-                val newQuestion = question.copy(questionId = newDocRef.id) // Assign the generated ID to the question
+                val newDocRef = questionCollectionRef.document() 
+                val newQuestion = question.copy(questionId = newDocRef.id)
 
-                newDocRef.set(newQuestion).await()  // Insert the new question
+                newDocRef.set(newQuestion).await() 
             }
 
         } catch (e: Exception) {
             e.printStackTrace()
-            // Handle the exception, e.g., log an error or rethrow it as needed
         }
     }
 
